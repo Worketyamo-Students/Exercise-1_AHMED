@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  user_id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  nom               String
+  email             String    @unique
+  motDePasse        String    
+  emprunts          emprunts[]
+  notifications     notification[]
+}
+
+model livres {
+  livres_id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  titre             String
+  auteur            String
+  description       String
+  anneePublication  Int
+  ISBN              String
+  emprunts          emprunts[]
+  notification      notification[]
+}
+
+model emprunts {
+  emprunt_id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  dateEmprunt       DateTime
+  dateRetour        DateTime  
+  user_id           String    @db.ObjectId
+  user              user      @relation(fields: [user_id], references: [user_id])
+  livres_id         String    @db.ObjectId
+  livres            livres    @relation(fields: [livres_id], references: [livres_id])
+}
+
+model notification {
+  notification_id   String    @id @default(auto()) @map("_id") @db.ObjectId
+  user_id           String    @db.ObjectId
+  user              user      @relation(fields: [user_id], references: [user_id])
+  livre_id          String    @db.ObjectId
+  livres_id         livres    @relation(fields: [livre_id], references: [livres_id])
+}
+
